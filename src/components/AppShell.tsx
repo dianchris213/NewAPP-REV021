@@ -182,9 +182,7 @@ export function TopBar({
               type="button"
               ref={bellRef}
               data-testid="notification-bell"
-              aria-label={
-                unreadCount ? `Notifikasi, ${unreadCount} belum dibaca` : "Notifikasi"
-              }
+              aria-label={unreadCount ? `Notifikasi, ${unreadCount} belum dibaca` : "Notifikasi"}
               aria-expanded={notifOpen}
               onClick={toggleNotif}
               className="relative flex h-12 w-12 items-center justify-center rounded-full transition-colors hover:bg-surface-variant/60"
@@ -252,7 +250,11 @@ export function TopBar({
             <div className="flex items-center gap-3">
               <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-outline-variant/30 bg-surface-container-high text-on-surface-variant">
                 {avatarDraft ? (
-                  <img src={avatarDraft} alt="Pratinjau foto profil" className="h-full w-full object-cover" />
+                  <img
+                    src={avatarDraft}
+                    alt="Pratinjau foto profil"
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <Icon name="person" className="text-[24px]" />
                 )}
@@ -302,13 +304,7 @@ export function TopBar({
   );
 }
 
-export function AppShell({
-  children,
-  topBar,
-}: {
-  children: ReactNode;
-  topBar?: ReactNode;
-}) {
+export function AppShell({ children, topBar }: { children: ReactNode; topBar?: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const {
     hydrated,
@@ -410,11 +406,7 @@ export function AppShell({
       </nav>
 
       <AddTransactionSheet />
-      <AllTransactionsSheet
-        open={allTxOpen}
-        onClose={handleCloseAllTx}
-        items={transactions}
-      />
+      <AllTransactionsSheet open={allTxOpen} onClose={handleCloseAllTx} items={transactions} />
     </div>
   );
 }

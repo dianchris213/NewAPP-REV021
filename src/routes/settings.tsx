@@ -78,7 +78,9 @@ function Toggle({ id, label }: { id: keyof SettingsState; label: string }) {
       aria-label={label}
       onClick={() => toggleSetting(id)}
       className={`h-6 w-11 rounded-full border p-0.5 transition-colors ${
-        on ? "border-primary bg-primary-container/60" : "border-outline-variant/40 bg-surface-variant"
+        on
+          ? "border-primary bg-primary-container/60"
+          : "border-outline-variant/40 bg-surface-variant"
       }`}
     >
       <span
@@ -412,20 +414,17 @@ export function FundSourceSheet({ onClose }: { onClose: () => void }) {
     resetTypeFilter();
   };
 
-  const list = useMemo(
-    () => {
-      const q = query.trim().toLowerCase();
-      return wallets
-        .filter((w) => (typeFilter === "all" ? true : w.type === typeFilter))
-        .filter((w) => (q ? w.name.toLowerCase().includes(q) : true))
-        .sort(
+  const list = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return wallets
+      .filter((w) => (typeFilter === "all" ? true : w.type === typeFilter))
+      .filter((w) => (q ? w.name.toLowerCase().includes(q) : true))
+      .sort(
         (a, b) =>
           WALLET_TYPES.indexOf(a.type) - WALLET_TYPES.indexOf(b.type) ||
           a.name.localeCompare(b.name),
       );
-    },
-    [wallets, query, typeFilter],
-  );
+  }, [wallets, query, typeFilter]);
 
   const confirmTarget = confirmId ? (wallets.find((w) => w.id === confirmId) ?? null) : null;
 
@@ -652,180 +651,180 @@ export function FundSourceSheet({ onClose }: { onClose: () => void }) {
             <ListSkeleton rows={3} label={copy.loadingFundSources} testId="fund-source-skeleton" />
           </div>
         ) : (
-        <ul
-          aria-label={copy.fundSources}
-          aria-busy={walletPending.add}
-          className="mt-4 list-none rounded-2xl bg-surface-container px-4 py-1"
-        >
-          {list.length ? (
-            list.map((w, index) => {
-              const used = walletUsage(w.id);
-              const editing = editingId === w.id;
-              const message = rowError && rowError.id === w.id ? rowError.message : null;
-              const firstOfType = index === 0 || list[index - 1]!.type !== w.type;
-              return (
-                <Fragment key={`group-${w.id}`}>
-                {firstOfType ? (
-                  <li
-                    role="presentation"
-                    className="pt-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-on-surface-variant/70"
-                  >
-                    {WALLET_TYPE_LABEL[w.type]}
-                  </li>
-                ) : null}
-                <li
-                  key={w.id}
-                  data-testid={`fund-source-item-${w.id}`}
-                  className="flex flex-col gap-2 border-b border-outline-variant/20 py-3 last:border-0"
-                >
-                  <div className="flex items-center gap-3">
-                    {editing ? (
-                      <input
-                        autoFocus
-                        value={editingName}
-                        maxLength={24}
-                        aria-label={`${copy.renameFundSource} ${w.name}`}
-                        aria-invalid={!!message}
-                        data-testid={`fund-source-rename-input-${w.id}`}
-                        onChange={(e) => setEditingName(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            void commitRename(w.id);
-                          }
-                          if (e.key === "Escape") {
-                            e.preventDefault();
-                            setEditingId(null);
-                            setRowError(null);
-                          }
-                        }}
-                        className="h-10 min-w-0 flex-1 rounded-2xl border border-outline-variant/30 bg-surface-container-high px-3 text-[14px] text-on-surface outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-                      />
-                    ) : (
-                      <span className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate text-sm font-medium text-on-surface">
-                          {w.name}
-                        </span>
-                        <span className="truncate text-[11px] text-on-surface-variant/80">
-                          {`${WALLET_TYPE_LABEL[w.type]} · ${formatIDR(w.balance)} · ${used}`}
-                        </span>
-                      </span>
-                    )}
-
-                    {editing ? (
-                      <>
-                        <button
-                          type="button"
-                          aria-label={copy.save}
-                          data-testid={`fund-source-rename-save-${w.id}`}
-                          disabled={!!walletPending.byId[w.id]}
-                          aria-busy={!!walletPending.byId[w.id]}
-                          onClick={() => void commitRename(w.id)}
-                          className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-container/40 text-primary focus-visible:ring-2 focus-visible:ring-primary/60"
-                        >
-                          <Icon name="check" className="text-[18px]" />
-                        </button>
-                        <button
-                          type="button"
-                          aria-label={copy.cancel}
-                          onClick={() => {
-                            setEditingId(null);
-                            setRowError(null);
-                          }}
-                          className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-variant text-on-surface-variant focus-visible:ring-2 focus-visible:ring-primary/60"
-                        >
-                          <Icon name="close" className="text-[18px]" />
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          aria-label={`${copy.rename} ${w.name}`}
-                          data-testid={`fund-source-rename-${w.id}`}
-                          onClick={() => {
-                            setEditingId(w.id);
-                            setEditingName(w.name);
-                            setRowError(null);
-                          }}
-                          className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-variant text-on-surface-variant focus-visible:ring-2 focus-visible:ring-primary/60"
-                        >
-                          <Icon name="edit" className="text-[18px]" />
-                        </button>
-                        <button
-                          type="button"
-                          aria-label={`${copy.delete} ${w.name}`}
-                          data-testid={`fund-source-delete-${w.id}`}
-                          aria-disabled={used > 0}
-                          disabled={!!walletPending.byId[w.id]}
-                          aria-busy={!!walletPending.byId[w.id]}
-                          onClick={() => {
-                            setRowError(null);
-                            if (used > 0) {
-                              setRowError({ id: w.id, message: copy.fundSourceInUse });
-                              announce(copy.fundSourceInUse, false);
-                              return;
-                            }
-                            setConfirmId(w.id);
-                          }}
-                          className={`flex h-9 w-9 items-center justify-center rounded-full bg-surface-variant focus-visible:ring-2 focus-visible:ring-primary/60 ${
-                            used > 0 ? "text-on-surface-variant/40" : "text-error"
-                          }`}
-                        >
-                          <Icon name="delete" className="text-[18px]" />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  {message ? (
-                    <p
-                      role="alert"
-                      data-testid={`fund-source-error-${w.id}`}
-                      className="m-0 text-[11px] font-semibold text-error"
+          <ul
+            aria-label={copy.fundSources}
+            aria-busy={walletPending.add}
+            className="mt-4 list-none rounded-2xl bg-surface-container px-4 py-1"
+          >
+            {list.length ? (
+              list.map((w, index) => {
+                const used = walletUsage(w.id);
+                const editing = editingId === w.id;
+                const message = rowError && rowError.id === w.id ? rowError.message : null;
+                const firstOfType = index === 0 || list[index - 1]!.type !== w.type;
+                return (
+                  <Fragment key={`group-${w.id}`}>
+                    {firstOfType ? (
+                      <li
+                        role="presentation"
+                        className="pt-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-on-surface-variant/70"
+                      >
+                        {WALLET_TYPE_LABEL[w.type]}
+                      </li>
+                    ) : null}
+                    <li
+                      key={w.id}
+                      data-testid={`fund-source-item-${w.id}`}
+                      className="flex flex-col gap-2 border-b border-outline-variant/20 py-3 last:border-0"
                     >
-                      {message}
-                    </p>
-                  ) : null}
-                </li>
-                </Fragment>
-              );
-            })
-          ) : (
-            <li
-              data-testid="fund-source-empty"
-              className="flex flex-col items-center gap-3 px-3 py-6 text-center"
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-variant text-primary">
-                <Icon name="account_balance_wallet" className="text-[22px]" />
-              </span>
-              <span className="text-[13px] font-bold text-on-surface">
-                {wallets.length ? copy.noFundSourceResults : copy.emptyFundSourceTitle}
-              </span>
-              <span className="text-[11px] text-on-surface-variant/80">
-                {wallets.length ? copy.emptyTypeHint : copy.emptyFundSourceBody}
-              </span>
-              {wallets.length ? (
-                <button
-                  type="button"
-                  data-testid="fund-source-empty-reset"
-                  onClick={resetFilters}
-                  className="rounded-full border border-outline-variant/30 px-4 py-2 text-[12px] font-semibold text-on-surface-variant focus-visible:ring-2 focus-visible:ring-primary/60"
-                >
-                  {copy.resetFilter}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  data-testid="fund-source-empty-cta"
-                  onClick={() => nameRef.current?.focus()}
-                  className="gradient-primary rounded-full px-5 py-2.5 text-[12px] font-bold text-on-primary-container focus-visible:ring-2 focus-visible:ring-primary/60"
-                >
-                  {copy.addFundSource}
-                </button>
-              )}
-            </li>
-          )}
-        </ul>
+                      <div className="flex items-center gap-3">
+                        {editing ? (
+                          <input
+                            autoFocus
+                            value={editingName}
+                            maxLength={24}
+                            aria-label={`${copy.renameFundSource} ${w.name}`}
+                            aria-invalid={!!message}
+                            data-testid={`fund-source-rename-input-${w.id}`}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                void commitRename(w.id);
+                              }
+                              if (e.key === "Escape") {
+                                e.preventDefault();
+                                setEditingId(null);
+                                setRowError(null);
+                              }
+                            }}
+                            className="h-10 min-w-0 flex-1 rounded-2xl border border-outline-variant/30 bg-surface-container-high px-3 text-[14px] text-on-surface outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                          />
+                        ) : (
+                          <span className="flex min-w-0 flex-1 flex-col">
+                            <span className="truncate text-sm font-medium text-on-surface">
+                              {w.name}
+                            </span>
+                            <span className="truncate text-[11px] text-on-surface-variant/80">
+                              {`${WALLET_TYPE_LABEL[w.type]} · ${formatIDR(w.balance)} · ${used}`}
+                            </span>
+                          </span>
+                        )}
+
+                        {editing ? (
+                          <>
+                            <button
+                              type="button"
+                              aria-label={copy.save}
+                              data-testid={`fund-source-rename-save-${w.id}`}
+                              disabled={!!walletPending.byId[w.id]}
+                              aria-busy={!!walletPending.byId[w.id]}
+                              onClick={() => void commitRename(w.id)}
+                              className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-container/40 text-primary focus-visible:ring-2 focus-visible:ring-primary/60"
+                            >
+                              <Icon name="check" className="text-[18px]" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label={copy.cancel}
+                              onClick={() => {
+                                setEditingId(null);
+                                setRowError(null);
+                              }}
+                              className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-variant text-on-surface-variant focus-visible:ring-2 focus-visible:ring-primary/60"
+                            >
+                              <Icon name="close" className="text-[18px]" />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              aria-label={`${copy.rename} ${w.name}`}
+                              data-testid={`fund-source-rename-${w.id}`}
+                              onClick={() => {
+                                setEditingId(w.id);
+                                setEditingName(w.name);
+                                setRowError(null);
+                              }}
+                              className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-variant text-on-surface-variant focus-visible:ring-2 focus-visible:ring-primary/60"
+                            >
+                              <Icon name="edit" className="text-[18px]" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label={`${copy.delete} ${w.name}`}
+                              data-testid={`fund-source-delete-${w.id}`}
+                              aria-disabled={used > 0}
+                              disabled={!!walletPending.byId[w.id]}
+                              aria-busy={!!walletPending.byId[w.id]}
+                              onClick={() => {
+                                setRowError(null);
+                                if (used > 0) {
+                                  setRowError({ id: w.id, message: copy.fundSourceInUse });
+                                  announce(copy.fundSourceInUse, false);
+                                  return;
+                                }
+                                setConfirmId(w.id);
+                              }}
+                              className={`flex h-9 w-9 items-center justify-center rounded-full bg-surface-variant focus-visible:ring-2 focus-visible:ring-primary/60 ${
+                                used > 0 ? "text-on-surface-variant/40" : "text-error"
+                              }`}
+                            >
+                              <Icon name="delete" className="text-[18px]" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                      {message ? (
+                        <p
+                          role="alert"
+                          data-testid={`fund-source-error-${w.id}`}
+                          className="m-0 text-[11px] font-semibold text-error"
+                        >
+                          {message}
+                        </p>
+                      ) : null}
+                    </li>
+                  </Fragment>
+                );
+              })
+            ) : (
+              <li
+                data-testid="fund-source-empty"
+                className="flex flex-col items-center gap-3 px-3 py-6 text-center"
+              >
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-variant text-primary">
+                  <Icon name="account_balance_wallet" className="text-[22px]" />
+                </span>
+                <span className="text-[13px] font-bold text-on-surface">
+                  {wallets.length ? copy.noFundSourceResults : copy.emptyFundSourceTitle}
+                </span>
+                <span className="text-[11px] text-on-surface-variant/80">
+                  {wallets.length ? copy.emptyTypeHint : copy.emptyFundSourceBody}
+                </span>
+                {wallets.length ? (
+                  <button
+                    type="button"
+                    data-testid="fund-source-empty-reset"
+                    onClick={resetFilters}
+                    className="rounded-full border border-outline-variant/30 px-4 py-2 text-[12px] font-semibold text-on-surface-variant focus-visible:ring-2 focus-visible:ring-primary/60"
+                  >
+                    {copy.resetFilter}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    data-testid="fund-source-empty-cta"
+                    onClick={() => nameRef.current?.focus()}
+                    className="gradient-primary rounded-full px-5 py-2.5 text-[12px] font-bold text-on-primary-container focus-visible:ring-2 focus-visible:ring-primary/60"
+                  >
+                    {copy.addFundSource}
+                  </button>
+                )}
+              </li>
+            )}
+          </ul>
         )}
 
         {confirmTarget ? (
@@ -1017,7 +1016,6 @@ function CategorySheet({ onClose }: { onClose: () => void }) {
     setError(undefined);
   };
 
-
   return (
     <div
       className="fixed inset-0 z-[180] flex items-end justify-center bg-black/60 backdrop-blur-sm"
@@ -1156,7 +1154,7 @@ function CategorySheet({ onClose }: { onClose: () => void }) {
           {list.length ? (
             list.map((c) => {
               const scope = c.walletId
-                ? wallets.find((w) => w.id === c.walletId)?.name ?? copy.allAccounts
+                ? (wallets.find((w) => w.id === c.walletId)?.name ?? copy.allAccounts)
                 : copy.allAccounts;
               const used = categoryUsage(c.id);
               const editing = editingId === c.id;
@@ -1271,7 +1269,6 @@ function CategorySheet({ onClose }: { onClose: () => void }) {
             </li>
           )}
         </ul>
-
       </div>
     </div>
   );

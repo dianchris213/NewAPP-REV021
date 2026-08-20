@@ -179,7 +179,8 @@ const dictionaries: Record<Language, Dict> = {
     allTypes: "Semua Jenis",
     noFundSourceResults: "Tidak ada sumber dana yang cocok.",
     confirmDeleteFundSourceTitle: "Hapus sumber dana?",
-    confirmDeleteFundSourceBody: "Sumber dana ini belum dipakai. Tindakan ini bisa dibatalkan lewat Undo.",
+    confirmDeleteFundSourceBody:
+      "Sumber dana ini belum dipakai. Tindakan ini bisa dibatalkan lewat Undo.",
     confirmDelete: "Ya, hapus",
     undo: "Urungkan",
     fundSourceRestored: "Sumber dana dipulihkan",

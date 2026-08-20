@@ -61,9 +61,7 @@ describe("ConfirmDeleteDialog", () => {
     const user = userEvent.setup();
     render(<ConfirmHarness />);
     await user.click(screen.getByTestId("opener"));
-    await waitFor(() =>
-      expect(screen.getByTestId("fund-source-confirm-delete")).toHaveFocus(),
-    );
+    await waitFor(() => expect(screen.getByTestId("fund-source-confirm-delete")).toHaveFocus());
   });
 
   it("confirms on Enter inside the dialog", async () => {
@@ -71,9 +69,7 @@ describe("ConfirmDeleteDialog", () => {
     const onConfirm = vi.fn();
     render(<ConfirmHarness onConfirm={onConfirm} />);
     await user.click(screen.getByTestId("opener"));
-    await waitFor(() =>
-      expect(screen.getByTestId("fund-source-confirm-delete")).toHaveFocus(),
-    );
+    await waitFor(() => expect(screen.getByTestId("fund-source-confirm-delete")).toHaveFocus());
     await user.keyboard("{Enter}");
     expect(onConfirm).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(screen.queryByTestId("fund-source-confirm")).toBeNull());
@@ -85,9 +81,7 @@ describe("ConfirmDeleteDialog", () => {
     render(<ConfirmHarness onConfirm={onConfirm} />);
     const opener = screen.getByTestId("opener");
     await user.click(opener);
-    await waitFor(() =>
-      expect(screen.getByTestId("fund-source-confirm-delete")).toHaveFocus(),
-    );
+    await waitFor(() => expect(screen.getByTestId("fund-source-confirm-delete")).toHaveFocus());
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByTestId("fund-source-confirm")).toBeNull());
     expect(onConfirm).not.toHaveBeenCalled();
@@ -98,9 +92,7 @@ describe("ConfirmDeleteDialog", () => {
     const user = userEvent.setup();
     render(<ConfirmHarness />);
     await user.click(screen.getByTestId("opener"));
-    await waitFor(() =>
-      expect(screen.getByTestId("fund-source-confirm-delete")).toHaveFocus(),
-    );
+    await waitFor(() => expect(screen.getByTestId("fund-source-confirm-delete")).toHaveFocus());
     await user.tab();
     expect(screen.getByTestId("fund-source-confirm")).toContainElement(
       document.activeElement as HTMLElement,

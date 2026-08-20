@@ -23,9 +23,7 @@ export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
       <div className="relative z-10 flex flex-1 flex-col justify-center">
         <div className="gradient-hero mb-stack-lg rounded-[28px] p-6">
           <span className="text-label uppercase text-primary/80">Telegram Mini App</span>
-          <h1 className="mt-2 text-display text-on-surface">
-            {isSignup ? "Buat Akun" : "Masuk"}
-          </h1>
+          <h1 className="mt-2 text-display text-on-surface">{isSignup ? "Buat Akun" : "Masuk"}</h1>
           <p className="mt-2 text-body text-on-surface-variant">
             {isSignup
               ? "Daftar sekali, catatan keuangan langsung tersinkron di Telegram."

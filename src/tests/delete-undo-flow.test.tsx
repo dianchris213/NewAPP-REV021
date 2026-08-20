@@ -84,7 +84,9 @@ describe("Delete + Undo end-to-end", () => {
     await screen.findByTestId("fund-source-confirm");
 
     await user.keyboard("{Escape}");
-    await waitFor(() => expect(screen.queryByTestId("fund-source-confirm")).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByTestId("fund-source-confirm")).not.toBeInTheDocument(),
+    );
     await waitFor(() => expect(deleteButton()).toHaveFocus());
     expect(screen.getByTestId("wallet-count")).toHaveTextContent("1");
   });
