@@ -8,6 +8,17 @@ import {
   type ReactNode,
 } from "react";
 
+type TelegramWebAppUser = {
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  photo_url?: string;
+};
+
+type TelegramGlobal = {
+  Telegram?: { WebApp?: { initDataUnsafe?: { user?: TelegramWebAppUser } } };
+};
+
 export type TxType = "income" | "expense";
 
 export type Transaction = {
@@ -728,7 +739,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (provider: "telegram" | "google", name?: string) => {
     setAuthLoading(provider);
     await new Promise((r) => setTimeout(r, 1200));
-    const tgUser = (globalThis as any)?.Telegram?.WebApp?.initDataUnsafe?.user;
+    const tgUser = (globalThis as unknown as TelegramGlobal).Telegram?.WebApp?.initDataUnsafe?.user;
     setUser({
       name:
         name ||

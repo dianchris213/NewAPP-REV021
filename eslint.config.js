@@ -26,6 +26,8 @@ export default tseslint.config(
       // dialog/focus-trap hygiene are enforced at lint time.
       ...jsxA11y.flatConfigs.recommended.rules,
       "jsx-a11y/no-autofocus": ["warn", { ignoreNonDOM: true }],
+      // Horizontally scrollable lists are keyboard-operable containers.
+      "jsx-a11y/no-noninteractive-tabindex": ["error", { tags: [], roles: ["list", "tabpanel"] }],
       "jsx-a11y/click-events-have-key-events": "warn",
       "jsx-a11y/no-static-element-interactions": "warn",
       "jsx-a11y/no-noninteractive-element-interactions": "warn",
@@ -43,6 +45,16 @@ export default tseslint.config(
       ],
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
+    },
+  },
+  {
+    // shadcn/ui primitives are unstyled wrappers: content and names are
+    // supplied by call sites, so content-presence rules cannot see them.
+    files: ["src/components/ui/**/*.tsx"],
+    rules: {
+      "jsx-a11y/heading-has-content": "off",
+      "jsx-a11y/anchor-has-content": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
   eslintPluginPrettier,

@@ -15,10 +15,21 @@ const tabs = [
 ] as const;
 
 /** Safe read of the Telegram WebApp user; never throws in a normal browser. */
+type TelegramWebAppUser = {
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  photo_url?: string;
+};
+
+type TelegramGlobal = {
+  Telegram?: { WebApp?: { initDataUnsafe?: { user?: TelegramWebAppUser } } };
+};
+
 function useTelegramUser() {
   const [tg, setTg] = useState<{ name?: string; avatar?: string; handle?: string } | null>(null);
   useEffect(() => {
-    const u = (globalThis as any)?.Telegram?.WebApp?.initDataUnsafe?.user;
+    const u = (globalThis as unknown as TelegramGlobal).Telegram?.WebApp?.initDataUnsafe?.user;
     if (!u) return;
     const name = [u?.first_name, u?.last_name].filter(Boolean).join(" ") || undefined;
     setTg({
