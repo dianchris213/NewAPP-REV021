@@ -234,7 +234,6 @@ export function AddTransactionSheet() {
         </div>
         <InlineError id="tx-amount-error" message={liveErrors.amount} />
 
-
         {/* Step 2 — Wallet type then registered sub-account */}
         <Step enabled={step1Done} hint="Isi nominal terlebih dahulu.">
           <StepLabel text="Akun Dompet" />
@@ -270,7 +269,11 @@ export function AddTransactionSheet() {
 
           {walletType ? (
             subWallets.length ? (
-              <div className="mt-2 flex flex-col gap-2" role="radiogroup" aria-label="Akun terdaftar">
+              <div
+                className="mt-2 flex flex-col gap-2"
+                role="radiogroup"
+                aria-label="Akun terdaftar"
+              >
                 {subWallets.map((w) => {
                   const active = walletId === w.id;
                   return (
@@ -402,7 +405,6 @@ function StepLabel({ text, htmlFor }: { text: string; htmlFor?: string }) {
   return <span className="mt-4 block text-label uppercase text-on-surface-variant">{text}</span>;
 }
 
-
 function Step({
   enabled,
   hint,
@@ -419,9 +421,7 @@ function Step({
       className={`m-0 border-0 p-0 transition-opacity ${enabled ? "opacity-100" : "opacity-40"}`}
     >
       {children}
-      {!enabled ? (
-        <p className="mt-1 text-[11px] text-on-surface-variant/70">{hint}</p>
-      ) : null}
+      {!enabled ? <p className="mt-1 text-[11px] text-on-surface-variant/70">{hint}</p> : null}
     </fieldset>
   );
 }

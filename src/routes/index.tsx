@@ -93,7 +93,7 @@ function Home() {
   const pocketStrip = useDragScroll<HTMLDivElement>();
   const visible = useMemo(() => transactions.slice(0, RECENT_LIMIT), [transactions]);
   const hidden = Math.max(transactions.length - RECENT_LIMIT, 0);
-  
+
   const openPocket = useCallback((name: string) => setActivePocket(name), []);
 
   // Hardened close handlers: stop event bubbling and force the boolean state to
@@ -114,7 +114,7 @@ function Home() {
         : [],
     [transactions, activePocket],
   );
-  
+
   const copyBalance = useCallback(async () => {
     const text = `Rp.${Math.abs(Math.round(balance)).toLocaleString("id-ID")}`;
     try {
@@ -212,7 +212,9 @@ function Home() {
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="truncate text-body font-medium text-on-surface">{b.name}</span>
                   <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] leading-tight">
-                    <span className={urgent ? "font-semibold text-error" : "text-on-surface-variant"}>
+                    <span
+                      className={urgent ? "font-semibold text-error" : "text-on-surface-variant"}
+                    >
                       {days === 0 ? "Jatuh tempo hari ini" : `Jatuh tempo dalam ${days} hari`}
                     </span>
                     <span className="text-on-surface-variant/50">·</span>
@@ -348,10 +350,7 @@ const PocketCard = memo(function PocketCard({
           e.stopPropagation();
           const start = startRef.current;
           startRef.current = null;
-          if (
-            start &&
-            (Math.abs(e.clientX - start.x) > 8 || Math.abs(e.clientY - start.y) > 8)
-          ) {
+          if (start && (Math.abs(e.clientX - start.x) > 8 || Math.abs(e.clientY - start.y) > 8)) {
             return;
           }
           onOpen(name);

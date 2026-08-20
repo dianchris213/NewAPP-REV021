@@ -58,10 +58,7 @@ function Analytics() {
     for (const t of inRange) {
       if (t.type !== "expense") continue;
       const ts = new Date(t.date).getTime();
-      const idx = Math.min(
-        range.buckets - 1,
-        Math.floor(((ts - start) / span) * range.buckets),
-      );
+      const idx = Math.min(range.buckets - 1, Math.floor(((ts - start) / span) * range.buckets));
       buckets[idx] = (buckets[idx] ?? 0) + t.amount;
     }
 
@@ -79,11 +76,7 @@ function Analytics() {
 
   return (
     <AppShell topBar={<TopBar eyebrow="Ringkasan" title="Analitik" />}>
-      <div
-        className="mb-stack-md flex gap-2 swipe-x"
-        role="tablist"
-        aria-label="Rentang waktu"
-      >
+      <div className="mb-stack-md flex gap-2 swipe-x" role="tablist" aria-label="Rentang waktu">
         {ranges.map((r) => (
           <button
             key={r.key}
@@ -106,7 +99,9 @@ function Analytics() {
         <p className="mt-1 text-display text-on-surface">{formatIDR(data.expense)}</p>
         <span className="mt-3 inline-flex items-center gap-1 rounded-full border border-outline-variant/30 px-3 py-1 text-xs text-on-surface-variant">
           <Icon
-            name={data.change > 0 ? "trending_up" : data.change < 0 ? "trending_down" : "trending_flat"}
+            name={
+              data.change > 0 ? "trending_up" : data.change < 0 ? "trending_down" : "trending_flat"
+            }
             className="text-[16px]"
           />
           {Math.abs(Math.round(data.change))}% dibanding periode sebelumnya
@@ -128,7 +123,11 @@ function Analytics() {
           <span className="text-xs text-on-surface-variant">per {range.bucketLabel}</span>
         </div>
         {data.expense ? (
-          <div className="flex h-40 items-end gap-2" role="img" aria-label="Grafik tren pengeluaran">
+          <div
+            className="flex h-40 items-end gap-2"
+            role="img"
+            aria-label="Grafik tren pengeluaran"
+          >
             {data.buckets.map((v, i) => (
               <div key={i} className="flex flex-1 flex-col items-center gap-2">
                 <div
@@ -152,7 +151,9 @@ function Analytics() {
               <div key={name} className="border-b border-outline-variant/20 py-3 last:border-0">
                 <div className="flex items-center justify-between">
                   <span className="text-body font-medium text-on-surface">{name}</span>
-                  <span className="text-body font-semibold text-on-surface">{formatIDR(value)}</span>
+                  <span className="text-body font-semibold text-on-surface">
+                    {formatIDR(value)}
+                  </span>
                 </div>
                 <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-variant">
                   <div

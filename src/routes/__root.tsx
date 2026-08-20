@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { captureMonitoringError, initMonitoring } from "../lib/monitoring";
 import { AppProvider } from "../lib/app-store";
 import { Toaster } from "../components/ui/sonner";
 
@@ -41,6 +42,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    void captureMonitoringError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
@@ -127,6 +129,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // Production crash / API error reporting (no-op without VITE_SENTRY_DSN).
+  useEffect(() => {
+    void initMonitoring();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -55,5 +55,6 @@ export function usePersistentState<T>(
 export const isString = (v: unknown): v is string => typeof v === "string";
 
 export function isOneOf<T extends string>(options: readonly T[]) {
-  return (v: unknown): v is T => typeof v === "string" && (options as readonly string[]).includes(v);
+  return (v: unknown): v is T =>
+    typeof v === "string" && (options as readonly string[]).includes(v);
 }

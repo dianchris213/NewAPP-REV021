@@ -8,6 +8,17 @@ import {
   type ReactNode,
 } from "react";
 
+type TelegramWebAppUser = {
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  photo_url?: string;
+};
+
+type TelegramGlobal = {
+  Telegram?: { WebApp?: { initDataUnsafe?: { user?: TelegramWebAppUser } } };
+};
+
 export type TxType = "income" | "expense";
 
 export type Transaction = {
@@ -96,13 +107,7 @@ export type Wallet = {
   balance: number;
 };
 
-export type WalletActivityKind =
-  | "topup"
-  | "transfer"
-  | "create"
-  | "rename"
-  | "delete"
-  | "profile";
+export type WalletActivityKind = "topup" | "transfer" | "create" | "rename" | "delete" | "profile";
 
 export type WalletActivity = {
   id: string;
@@ -147,9 +152,7 @@ export function isPocketNameTaken(
   const key = fundSourceKey(input);
   return wallets.some(
     (w) =>
-      w.id !== input.ignoreId &&
-      fundSourceKey(w) === key &&
-      w.name.trim().toLowerCase() === name,
+      w.id !== input.ignoreId && fundSourceKey(w) === key && w.name.trim().toLowerCase() === name,
   );
 }
 
@@ -167,7 +170,6 @@ const defaultSettings: Settings = {
 const seedWallets = (): Wallet[] => [];
 
 const seedWalletActivity = (): WalletActivity[] => [];
-
 
 const seedTransactions = (): Transaction[] => {
   const now = Date.now();
@@ -221,9 +223,7 @@ type AppState = {
   openCurrentMonth: () => void;
   login: (provider: "telegram" | "google", name?: string) => Promise<void>;
   logout: () => void;
-  addTransaction: (
-    input: Omit<Transaction, "id" | "date" | "pending"> & { date?: string },
-  ) => void;
+  addTransaction: (input: Omit<Transaction, "id" | "date" | "pending"> & { date?: string }) => void;
   updateTransaction: (id: string, patch: Partial<Omit<Transaction, "id">>) => void;
   deleteTransaction: (id: string) => void;
   toggleSetting: (key: keyof Settings) => void;
@@ -287,34 +287,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }>({ add: false, byId: {} });
   const [profileSaving, setProfileSaving] = useState(false);
 
-  const addCategory = useCallback(
-    (input: { name: string; type: TxType; walletId?: string }) => {
-      const name = input.name.trim().replace(/\s+/g, " ");
-      if (name.length < 2 || name.length > 24) return false;
-      let ok = false;
-      setCategories((prev) => {
-        const duplicate = prev.some(
-          (c) =>
-            c.type === input.type &&
-            c.name.toLowerCase() === name.toLowerCase() &&
-            (c.walletId ?? "") === (input.walletId ?? ""),
-        );
-        if (duplicate) return prev;
-        ok = true;
-        return [
-          ...prev,
-          {
-            id: `c${Date.now()}${Math.round(Math.random() * 1000)}`,
-            name,
-            type: input.type,
-            ...(input.walletId ? { walletId: input.walletId } : {}),
-          },
-        ];
-      });
-      return ok;
-    },
-    [],
-  );
+  const addCategory = useCallback((input: { name: string; type: TxType; walletId?: string }) => {
+    const name = input.name.trim().replace(/\s+/g, " ");
+    if (name.length < 2 || name.length > 24) return false;
+    let ok = false;
+    setCategories((prev) => {
+      const duplicate = prev.some(
+        (c) =>
+          c.type === input.type &&
+          c.name.toLowerCase() === name.toLowerCase() &&
+          (c.walletId ?? "") === (input.walletId ?? ""),
+      );
+      if (duplicate) return prev;
+      ok = true;
+      return [
+        ...prev,
+        {
+          id: `c${Date.now()}${Math.round(Math.random() * 1000)}`,
+          name,
+          type: input.type,
+          ...(input.walletId ? { walletId: input.walletId } : {}),
+        },
+      ];
+    });
+    return ok;
+  }, []);
 
   const categoryUsage = useCallback(
     (id: string) => {
@@ -361,8 +358,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [categoryUsage],
   );
 
-
-
   const categoriesFor = useCallback(
     (type: TxType, walletId?: string) =>
       categories.filter(
@@ -404,7 +399,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const addWallet = useCallback(
     async (input: { name: string; type: WalletType; provider?: string; balance: number }) => {
       const name = input.name.trim().replace(/\s+/g, " ");
-      if (name.length < 2 || name.length > 24) return false;
+      // Fund source names require at least 3 characters.
+      if (name.length < 3 || name.length > 24) return false;
       let ok = false;
       const id = `w${Date.now()}`;
       const wallet: Wallet = {
@@ -448,7 +444,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const renameWallet = useCallback(
     async (id: string, next: string) => {
       const name = next.trim().replace(/\s+/g, " ");
-      if (!id || name.length < 2 || name.length > 24) return false;
+      if (!id || name.length < 3 || name.length > 24) return false;
       let ok = false;
       let before = "";
       markPending(id, "rename");
@@ -546,7 +542,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [pushActivity],
   );
 
-
   const topUpWallet = useCallback(
     ({ walletId, amount, source }: { walletId: string; amount: number; source?: string }) => {
       const value = Math.round(amount);
@@ -563,7 +558,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       pushActivity({
         kind: "topup",
         title: `Isi Saldo ${target?.name ?? "Kantong"}`,
-        detail: source?.trim() ? `${target?.provider ?? ""} · dari ${source.trim()}`.replace(/^ · /, "") : target?.provider ?? "Top up manual",
+        detail: source?.trim()
+          ? `${target?.provider ?? ""} · dari ${source.trim()}`.replace(/^ · /, "")
+          : (target?.provider ?? "Top up manual"),
         amount: value,
       });
       return true;
@@ -632,7 +629,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         ok = true;
         changes = [
           next.name !== prev.name ? `Nama: ${prev.name} → ${next.name}` : "",
-          next.avatar !== prev.avatar ? (next.avatar ? "Foto profil diperbarui" : "Foto profil dihapus") : "",
+          next.avatar !== prev.avatar
+            ? next.avatar
+              ? "Foto profil diperbarui"
+              : "Foto profil dihapus"
+            : "",
         ].filter(Boolean);
         return next;
       });
@@ -738,7 +739,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (provider: "telegram" | "google", name?: string) => {
     setAuthLoading(provider);
     await new Promise((r) => setTimeout(r, 1200));
-    const tgUser = (globalThis as any)?.Telegram?.WebApp?.initDataUnsafe?.user;
+    const tgUser = (globalThis as unknown as TelegramGlobal).Telegram?.WebApp?.initDataUnsafe?.user;
     setUser({
       name:
         name ||
@@ -776,23 +777,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         );
       }
       setTimeout(() => {
-        setTransactions((prev) =>
-          prev.map((t) => (t.id === id ? { ...t, pending: false } : t)),
-        );
+        setTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, pending: false } : t)));
       }, 700);
     },
     [],
   );
 
-  const updateTransaction = useCallback(
-    (id: string, patch: Partial<Omit<Transaction, "id">>) => {
-      if (!id) return;
-      setTransactions((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, ...patch, id: t.id } : t)),
-      );
-    },
-    [],
-  );
+  const updateTransaction = useCallback((id: string, patch: Partial<Omit<Transaction, "id">>) => {
+    if (!id) return;
+    setTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch, id: t.id } : t)));
+  }, []);
 
   const deleteTransaction = useCallback((id: string) => {
     if (!id) return;
@@ -818,10 +812,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return { totalIncome: income, totalExpense: expense };
   }, [transactions]);
 
-  const walletBalance = useMemo(
-    () => wallets.reduce((sum, w) => sum + w.balance, 0),
-    [wallets],
-  );
+  const walletBalance = useMemo(() => wallets.reduce((sum, w) => sum + w.balance, 0), [wallets]);
 
   // Stable context value: consumers only re-render when real data changes.
   const value = useMemo<AppState>(
@@ -925,7 +916,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       totalIncome,
       totalExpense,
     ],
-
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

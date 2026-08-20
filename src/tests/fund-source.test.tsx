@@ -139,7 +139,9 @@ describe("Kartu Sumber Dana", () => {
     const walletId = screen.getByTestId("wallet-id").textContent!;
     await user.click(screen.getByTestId(`fund-source-delete-${walletId}`));
     await user.click(await screen.findByTestId("fund-source-confirm-cancel"));
-    await waitFor(() => expect(screen.queryByTestId("fund-source-confirm")).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByTestId("fund-source-confirm")).not.toBeInTheDocument(),
+    );
     expect(screen.getByTestId("wallet-count")).toHaveTextContent("1");
   });
 
