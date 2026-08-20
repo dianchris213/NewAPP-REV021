@@ -404,7 +404,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const addWallet = useCallback(
     async (input: { name: string; type: WalletType; provider?: string; balance: number }) => {
       const name = input.name.trim().replace(/\s+/g, " ");
-      if (name.length < 2 || name.length > 24) return false;
+      // Fund source names require at least 3 characters.
+      if (name.length < 3 || name.length > 24) return false;
       let ok = false;
       const id = `w${Date.now()}`;
       const wallet: Wallet = {
@@ -448,7 +449,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const renameWallet = useCallback(
     async (id: string, next: string) => {
       const name = next.trim().replace(/\s+/g, " ");
-      if (!id || name.length < 2 || name.length > 24) return false;
+      if (!id || name.length < 3 || name.length > 24) return false;
       let ok = false;
       let before = "";
       markPending(id, "rename");

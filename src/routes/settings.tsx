@@ -443,7 +443,7 @@ export function FundSourceSheet({ onClose }: { onClose: () => void }) {
     const duplicate = wallets.some(
       (w) => w.type === type && w.name.toLowerCase() === trimmed.toLowerCase(),
     );
-    if (trimmed.length < 2 || trimmed.length > 24 || duplicate) {
+    if (trimmed.length < 3 || trimmed.length > 24 || duplicate) {
       setError(copy.invalidFundSource);
       announce(copy.invalidFundSource, false);
       return;
@@ -456,6 +456,9 @@ export function FundSourceSheet({ onClose }: { onClose: () => void }) {
     }
     setName("");
     setError(undefined);
+    // Clear active search/type filters so the freshly created fund source is
+    // always visible in the list below instead of being filtered out.
+    if (filtersDirty) resetFilters();
     announce(copy.fundSourceAdded, true);
   };
 
@@ -555,6 +558,7 @@ export function FundSourceSheet({ onClose }: { onClose: () => void }) {
             <span className="text-meta text-on-surface-variant/80">{copy.fundSourceName}</span>
             <input
               value={name}
+              minLength={3}
               maxLength={24}
               required
               autoComplete="off"
@@ -1070,6 +1074,7 @@ function CategorySheet({ onClose }: { onClose: () => void }) {
             <span className="text-meta text-on-surface-variant/80">{copy.categoryName}</span>
             <input
               value={name}
+              minLength={3}
               maxLength={24}
               data-testid="category-name"
               aria-invalid={!!error}
