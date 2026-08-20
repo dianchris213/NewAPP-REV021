@@ -48,11 +48,37 @@ The app ships with **zero** categories. Users create them in **Settings → Kate
 
 `src/lib/app-store.tsx` is a single React context store: user, transactions, wallets, wallet activity, categories, settings, language, lock state, and transaction filters. Persisted to `localStorage` (`tmab-state-v1`) with debounced writes.
 
+### Delete + Undo (a11y)
+- Delete opens a focus-trapped `role="alertdialog"`; focus lands on the destructive action.
+- `Enter` confirms, `Escape` cancels and returns focus to the trigger button.
+- After deletion a toast exposes an **Urungkan** (undo) action that receives focus; `Enter` restores the record, `Escape` dismisses the toast and returns focus to the trigger.
+
 ## Development
 
 ```sh
-npm i
-npm run dev
+bun install
+bun run dev
+```
+
+## Testing (Vitest)
+
+Vitest runs in `jsdom` with Testing Library (`vitest.config.ts`, setup in `src/tests/setup.ts`).
+
+```sh
+bun run test          # single run of all suites (vitest run)
+bun run test:watch    # watch mode
+bunx vitest run src/tests/delete-undo.test.tsx   # delete dialog + undo toast only
+```
+
+Current suites:
+- `src/tests/delete-undo.test.tsx` — delete confirmation dialog and undo toast: initial focus, Enter to confirm/undo, Escape to cancel/dismiss with focus return, Tab focus trap.
+- `src/tests/fund-source.test.tsx` — fund source CRUD, duplicate guard, in-use delete block, search/type filter, audit log.
+
+Typecheck and production build:
+
+```sh
+bunx tsgo --noEmit
+bun run build
 ```
 
 ## Built with
@@ -69,4 +95,4 @@ npm run dev
 - **Hapus**: dialog konfirmasi (`role="alertdialog"`) hanya untuk sumber dana yang tidak dipakai; yang masih dipakai diblokir dengan pesan inline. Setelah dihapus muncul toast dengan aksi **Urungkan** (`restoreWallet`).
 - **Tambah Kantong**: urutan `Jenis` → `Nama Sumber Dana` → `Nama Kantong` → `Saldo Awal`, validasi inline per-field, dan penyimpanan diblokir bila belum ada / belum memilih Sumber Dana.
 - **Empty state**: daftar bawaan dihapus total; Sumber Dana & pilihan provider kosong sampai user membuatnya sendiri.
-- Test: `bunx vitest run`.
+- Test: `bun run test` (lihat bagian **Testing (Vitest)**).
