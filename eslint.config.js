@@ -3,6 +3,7 @@ import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
@@ -17,9 +18,17 @@ export default tseslint.config(
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
+      "jsx-a11y": jsxA11y,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // Automated accessibility checks: ARIA validity, keyboard navigation and
+      // dialog/focus-trap hygiene are enforced at lint time.
+      ...jsxA11y.flatConfigs.recommended.rules,
+      "jsx-a11y/no-autofocus": ["warn", { ignoreNonDOM: true }],
+      "jsx-a11y/click-events-have-key-events": "warn",
+      "jsx-a11y/no-static-element-interactions": "warn",
+      "jsx-a11y/no-noninteractive-element-interactions": "warn",
       "no-restricted-imports": [
         "error",
         {
