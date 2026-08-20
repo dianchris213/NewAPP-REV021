@@ -1074,7 +1074,7 @@ function CategorySheet({ onClose }: { onClose: () => void }) {
             <span className="text-meta text-on-surface-variant/80">{copy.categoryName}</span>
             <input
               value={name}
-              minLength={3}
+              minLength={2}
               maxLength={24}
               data-testid="category-name"
               aria-invalid={!!error}
