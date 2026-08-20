@@ -2,10 +2,14 @@
  * Post-build / post-deploy smoke test.
  *
  * Usage:
- *   bun run smoke                       # boots `vite preview` and checks it
- *   SMOKE_URL=https://app.example.com bun run smoke   # checks a deployment
+ *   bun run smoke                                    # verifies build artifacts,
+ *                                                    # then boots a local server
+ *   SMOKE_URL=https://app.example.com bun run smoke  # checks a real deployment
+ *
+ * Exits non-zero on the first failing route so CI/deploy pipelines stop early.
  */
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 
 const ROUTES = ["/", "/wallet", "/settings", "/analytics"];
 const EXTERNAL = process.env.SMOKE_URL;
@@ -42,10 +46,22 @@ async function checkRoutes() {
   return failures;
 }
 
+/** The production build must exist before a local smoke run. */
+function checkArtifacts() {
+  const required = ["dist/server/index.mjs", "dist/client", "dist/nitro.json"];
+  const missing = required.filter((f) => !existsSync(f));
+  if (missing.length) {
+    throw new Error(`Missing production build output: ${missing.join(", ")}. Run \`bun run build\` first.`);
+  }
+  console.log("ok   production build artifacts present");
+}
+
 let server;
 if (!EXTERNAL) {
-  server = spawn("bunx", ["vite", "preview", "--port", "4173", "--strictPort"], {
+  checkArtifacts();
+  server = spawn("bunx", ["vite", "dev", "--port", "4173", "--strictPort"], {
     stdio: ["ignore", "inherit", "inherit"],
+    env: { ...process.env, NODE_ENV: "development" },
   });
 }
 
